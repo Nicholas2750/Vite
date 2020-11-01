@@ -1,0 +1,10 @@
+<h3 class="mb-4">Your Rides</h3>
+
+{% if rides %}
+  {% for ride in rides %}
+  - <a class="btn btn-link" href="/ride/{{ ride.id }}">{{ride.name}}</a>
+  {% endfor %}
+{% else %}
+  <h5>You have not uploaded any rides yet.</h5>
+  <h5>Start uploading some rides to look at your stats!</h5>
+{% endif %}

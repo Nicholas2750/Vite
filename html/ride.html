@@ -1,0 +1,19 @@
+{% include 'head.html' %}
+{% include 'nav.html' %}
+
+<div class="container">
+  <h2 class="my-4"> {{ ride.name }} </h2>
+
+  <canvas id="ridechart"></canvas>
+  
+  <form action="/delete/ride/{{ ride.id }}" method="POST" enctype="multipart/form-data">
+    <button class="btn btn-danger">Delete Ride</button>
+  </form>
+  <form action="/update/ride/{{ ride.id }}" method="POST" enctype="multipart/form-data">
+    <button class="btn btn-warning">Update Ride Name</button>
+    <input type="text" name="newname"></input>
+  </form>
+</div>
+
+{% include 'foot.html' %}
+<script src="/static/js/ride.js"></script>

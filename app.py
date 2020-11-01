@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from flask_mysqldb import MySQL
 import gpxpy
 import sqlqueries
@@ -22,14 +22,14 @@ def execute_query(query):
 
 @app.route('/')
 def index():
-  return render_template('index.html')
+  return render_template('index.html', rides=[{'name':'test', 'id':1}])
 
 @app.route('/<path:path>')
 def serve_html(path):
   return render_template(f'{path}.html')
 
 @app.route('/ride', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def get_ride():
+def get_rides():
   if request.method == 'GET':
     pass
   elif request.method == 'POST': # Add ride
@@ -60,6 +60,18 @@ def get_ride():
     pass
   print(sqlqueries.get_ride)
   pass
+
+@app.route('/ride/<path:ride_id>', methods=['GET'])
+def get_ride(ride_id):
+  return render_template('ride.html', ride={'name': 'test ride', 'id': ride_id})
+
+@app.route('/delete/ride/<path:ride_id>', methods=['POST'])
+def delete_ride(ride_id):
+  return redirect('/')
+
+@app.route('/update/ride/<path:ride_id>', methods=['POST'])
+def update_ride(ride_id):
+  return render_template('ride.html', ride={'name': 'test ride'})
 
 '''
 @app.route('/race', methods=['GET', 'POST', 'PUT'])
