@@ -4,9 +4,9 @@
   </div>
   <div class="card-body">
     <h5 class="card-title">Adding More Rides Gives You Better Analysis Result</h5>
-    <form>
+    <form action="/ride" method="POST" enctype="multipart/form-data">
       <div class="form-group">
-        <input type="file" class="form-control-file" id="file_input" multiple>
+        <input type="file" class="form-control-file" name="file" multiple>
       </div>
 
       <button type="submit" class="btn btn-primary">Upload</button>
