@@ -1,6 +1,8 @@
 from flask import Flask, request, render_template
 import mysql
+import gpxpy
 import sqlqueries
+import parser
 
 app = Flask(__name__, static_url_path='/static', template_folder='html')
 
@@ -17,7 +19,13 @@ def get_ride():
   if request.method == 'GET':
     pass
   elif request.method == 'POST':
-    pass
+    files = request.files.getlist("file")
+    rides = ""
+    for ride in files:
+      rides += str(parser.parse_ride(ride))
+
+    return rides
+
   elif request.method == 'PUT':
     pass
   elif request.method == 'DELETE':
