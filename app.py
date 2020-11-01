@@ -1,10 +1,24 @@
 from flask import Flask, request, render_template
-import mysql
+from flask_mysqldb import MySQL
 import gpxpy
 import sqlqueries
 import parser
 
 app = Flask(__name__, static_url_path='/static', template_folder='html')
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_DB'] = 'vite_data'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+mysql = MySQL(app)
+
+def execute_query(query):
+  cursor = mysql.connection.cursor()
+  cursor.execute(query)
+  result = cursor.fetchall()
+  cursor.close()
+  mysql.connection.commit()
+  return result
 
 @app.route('/')
 def index():
@@ -18,13 +32,27 @@ def serve_html(path):
 def get_ride():
   if request.method == 'GET':
     pass
-  elif request.method == 'POST':
+  elif request.method == 'POST': # Add ride
     files = request.files.getlist("file")
     rides = ""
     for ride in files:
-      rides += str(parser.parse_ride(ride))
+      data = parser.parse_ride(ride)
+      add_ride_query = sqlqueries.add_ride.format(athlete_id=1, activity_name=data['name'], time=data['time'].strftime('%Y-%m-%d %H:%M:%S'))
+      execute_query(add_ride_query) # Insert into ride table
+      ride_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
 
-    return rides
+      for datapoint in data['datapoints']: # Insert data points 
+        add_data_point = sqlqueries.add_data_point.format(time_stamp=datapoint['time'], 
+                                                          activity_id=ride_id, 
+                                                          elevation=datapoint['elevation'], 
+                                                          power=datapoint['power'], 
+                                                          temperature=datapoint['temperature'], 
+                                                          cadence=datapoint['cadence'], 
+                                                          latitude=datapoint['latitude'], 
+                                                          longitude=datapoint['longitude'], 
+                                                          heartrate=datapoint['heartrate'])
+        execute_query(add_data_point)
+    return "Success!"
 
   elif request.method == 'PUT':
     pass

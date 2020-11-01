@@ -7,7 +7,9 @@ get_athlete = "SQL HERE"
 get_data_point = "SQL HERE"
 
 '''Post Requests'''
-add_ride = "SQL HERE"
+add_ride = "INSERT INTO Ride (AthleteID, ActivityName, Time) VALUES ({athlete_id}, '{activity_name}', '{time}');"
+get_last_insert_id = "SELECT LAST_INSERT_ID();"
+add_data_point = "INSERT INTO DataPoint (TimeStamp, ActivityID, Elevation, Power, Temperature, Cadence, Latitude, Longitude, Heartrate) VALUES('{time_stamp}', {activity_id}, {elevation}, {power}, {temperature}, {cadence}, {latitude}, {longitude}, {heartrate});"
 add_race = "SQL HERE"
 add_athlete = "SQL HERE"
 
