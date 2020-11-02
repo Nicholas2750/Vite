@@ -22,13 +22,15 @@ def execute_query(query):
 
 @app.route('/')
 def index():
-  return render_template('index.html', rides=[{'name':'test', 'id':1}])
+  rides = execute_query(sqlqueries.get_all_rides)
+  print(rides)
+  return render_template('index.html', rides=rides)
 
 @app.route('/<path:path>')
 def serve_html(path):
   return render_template(f'{path}.html')
 
-@app.route('/ride', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/ride', methods=['GET', 'POST'])
 def get_rides():
   if request.method == 'GET':
     pass
@@ -52,59 +54,36 @@ def get_rides():
                                                           longitude=datapoint['longitude'], 
                                                           heartrate=datapoint['heartrate'])
         execute_query(add_data_point)
-    return "Success!"
+    return redirect('/')
 
-  elif request.method == 'PUT':
-    pass
-  elif request.method == 'DELETE':
-    pass
-  print(sqlqueries.get_ride)
-  pass
+  return None
 
 @app.route('/ride/<path:ride_id>', methods=['GET'])
 def get_ride(ride_id):
-  return render_template('ride.html', ride={'name': 'test ride', 'id': ride_id})
+  ride = execute_query(sqlqueries.get_ride.format(activity_id=ride_id))[0]
+  datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id))
+
+  packed_data = {}
+
+  for point in datapoints:
+    for key in point:
+      if key in packed_data:
+        packed_data[key].append(point[key])
+      else:
+        packed_data[key] = [point[key]]
+
+  return render_template('ride.html', ride=ride, datapoints=packed_data)
 
 @app.route('/delete/ride/<path:ride_id>', methods=['POST'])
 def delete_ride(ride_id):
+  execute_query(sqlqueries.delete_ride.format(activity_id=ride_id))
   return redirect('/')
 
 @app.route('/update/ride/<path:ride_id>', methods=['POST'])
 def update_ride(ride_id):
-  return render_template('ride.html', ride={'name': 'test ride'})
-
-'''
-@app.route('/race', methods=['GET', 'POST', 'PUT'])
-def get_race():
-  if request.method == 'GET':
-    pass
-  elif request.method == 'POST':
-    pass
-  elif request.method == 'PUT':
-    pass
-  print(sqlqueries.get_race)
-  pass
-
-@app.route('/athlete', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def get_athlete():
-  if request.method == 'GET':
-    pass
-  elif request.method == 'POST':
-    pass
-  elif request.method == 'PUT':
-    pass
-  elif request.method == 'DELETE':
-    pass
-  print(sqlqueries.get_athlete)
-  pass
-
-@app.route('/data_point', methods=['GET'])
-def get_data_point():
-  if request.method == 'GET':
-    pass
-  print(sqlqueries.get_data_point)
-  pass
-'''
+  new_name = request.form['newname']
+  execute_query(sqlqueries.update_ride.format(activity_id=ride_id, activity_name=new_name))
+  return redirect(f'/ride/{ride_id}')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
