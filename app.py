@@ -23,7 +23,6 @@ def execute_query(query):
 @app.route('/')
 def index():
   rides = execute_query(sqlqueries.get_all_rides)
-  print(rides)
   return render_template('index.html', rides=rides)
 
 @app.route('/<path:path>')
@@ -44,15 +43,15 @@ def get_rides():
       ride_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
 
       for datapoint in data['datapoints']: # Insert data points 
-        add_data_point = sqlqueries.add_data_point.format(time_stamp=datapoint['time'], 
+        add_data_point = sqlqueries.add_data_point.format(time_stamp=datapoint.get('time', 'null'), 
                                                           activity_id=ride_id, 
-                                                          elevation=datapoint['elevation'], 
-                                                          power=datapoint['power'], 
-                                                          temperature=datapoint['temperature'], 
-                                                          cadence=datapoint['cadence'], 
-                                                          latitude=datapoint['latitude'], 
-                                                          longitude=datapoint['longitude'], 
-                                                          heartrate=datapoint['heartrate'])
+                                                          elevation=datapoint.get('elevation', 'null'), 
+                                                          power=datapoint.get('power', 'null'), 
+                                                          temperature=datapoint.get('temperature', 'null'), 
+                                                          cadence=datapoint.get('cadence', 'null'), 
+                                                          latitude=datapoint.get('latitude', 'null'), 
+                                                          longitude=datapoint.get('longitude', 'null'), 
+                                                          heartrate=datapoint.get('heartrate', 'null'))
         execute_query(add_data_point)
     return redirect('/')
 
