@@ -2,18 +2,38 @@
 {% include 'nav.html' %}
 
 <div class="container">
-  <h2 class="my-4"> {{ ride.name }} </h2>
+  <h2 class="my-4"> {{ ride.ActivityName }} </h2>
 
-  <canvas id="ridechart"></canvas>
+  <canvas id="heartRateChart"></canvas>
   
-  <form action="/delete/ride/{{ ride.id }}" method="POST" enctype="multipart/form-data">
+  <form action="/delete/ride/{{ ride.ActivityId }}" method="POST" enctype="multipart/form-data">
     <button class="btn btn-danger">Delete Ride</button>
   </form>
-  <form action="/update/ride/{{ ride.id }}" method="POST" enctype="multipart/form-data">
+  <form action="/update/ride/{{ ride.ActivityId }}" method="POST" enctype="multipart/form-data">
     <button class="btn btn-warning">Update Ride Name</button>
     <input type="text" name="newname"></input>
   </form>
 </div>
 
 {% include 'foot.html' %}
-<script src="/static/js/ride.js"></script>
+<script>
+let seconds = Array.from({{ datapoints.Heartrate }}.keys());
+
+let ctx = document.getElementById('heartRateChart').getContext('2d');
+let chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'line',
+
+    // The data for our dataset
+    data: {
+        labels: seconds,
+        datasets: [{
+            label: 'Heart Rate',
+            borderColor: 'rgb(255, 99, 132)',
+            data: {{ datapoints.Heartrate }}
+        }]
+    },
+
+    // Configuration options go here
+});
+</script>
