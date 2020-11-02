@@ -4,7 +4,13 @@
 <div class="container">
   <h2 class="my-4"> {{ ride.ActivityName }} </h2>
 
+  <canvas id="latitudeChart"></canvas>
+  <canvas id="longitudeChart"></canvas>
+  <canvas id="elevationChart"></canvas>
+  <canvas id="temperatureChart"></canvas>
   <canvas id="heartRateChart"></canvas>
+  <canvas id="powerChart"></canvas>
+  <canvas id="cadenceChart"></canvas>
   
   <form action="/delete/ride/{{ ride.ActivityId }}" method="POST" enctype="multipart/form-data">
     <button class="btn btn-danger">Delete Ride</button>
@@ -17,23 +23,88 @@
 
 {% include 'foot.html' %}
 <script>
-let seconds = Array.from({{ datapoints.Heartrate }}.keys());
-
-let ctx = document.getElementById('heartRateChart').getContext('2d');
-let chart = new Chart(ctx, {
-    // The type of chart we want to create
+let seconds = Array.from({{ datapoints.Elevation }}.keys());
+new Chart(document.getElementById('latitudeChart').getContext('2d'), {
     type: 'line',
+    data: {
+        labels: seconds,
+        datasets: [{
+            label: 'Latitude',
+            borderColor: 'red',
+            data: {{ datapoints.Latitude }}
+        }]
+    },
+});
 
-    // The data for our dataset
+new Chart(document.getElementById('longitudeChart').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: seconds,
+        datasets: [{
+            label: 'Longitude',
+            borderColor: 'green',
+            data: {{ datapoints.Longitude }}
+        }]
+    },
+});
+
+new Chart(document.getElementById('elevationChart').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: seconds,
+        datasets: [{
+            label: 'Elevation',
+            borderColor: 'blue',
+            data: {{ datapoints.Elevation }}
+        }]
+    },
+});
+
+new Chart(document.getElementById('temperatureChart').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: seconds,
+        datasets: [{
+            label: 'Temperature',
+            borderColor: 'orange',
+            data: {{ datapoints.Temperature }}
+        }]
+    },
+});
+
+new Chart(document.getElementById('heartRateChart').getContext('2d'), {
+    type: 'line',
     data: {
         labels: seconds,
         datasets: [{
             label: 'Heart Rate',
-            borderColor: 'rgb(255, 99, 132)',
+            borderColor: 'pink',
             data: {{ datapoints.Heartrate }}
         }]
     },
+});
 
-    // Configuration options go here
+new Chart(document.getElementById('powerChart').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: seconds,
+        datasets: [{
+            label: 'Power',
+            borderColor: 'purple',
+            data: {{ datapoints.Power }}
+        }]
+    },
+});
+
+new Chart(document.getElementById('cadenceChart').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: seconds,
+        datasets: [{
+            label: 'Cadence',
+            borderColor: 'teal',
+            data: {{ datapoints.Cadence }}
+        }]
+    },
 });
 </script>
