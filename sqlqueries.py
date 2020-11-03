@@ -1,7 +1,7 @@
 # SQL Queries
 
 '''Get Requests'''
-get_all_rides = "SELECT ActivityId, ActivityName FROM Ride;"
+get_all_rides = "SELECT ActivityId, ActivityName FROM Ride WHERE ActivityName LIKE '%{query}%';"
 get_ride = "SELECT ActivityId, ActivityName FROM Ride WHERE ActivityId = {activity_id};"
 get_race = "SQL HERE"
 get_athlete = "SQL HERE"

@@ -1,5 +1,11 @@
 <h3 class="mb-4">Your Rides</h3>
 
+<form action="/" method="GET" enctype="multipart/form-data">
+  <p class="lead">Search for a specific ride:</p>
+  <input type="text" name="query"></input>
+  <button class="btn btn-success">Search</button>
+</form>
+
 {% if rides %}
   {% for ride in rides %}
   - <a class="btn btn-link" href="/ride/{{ ride.ActivityId }}">{{ride.ActivityName}}</a>

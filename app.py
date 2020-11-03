@@ -22,7 +22,12 @@ def execute_query(query):
 
 @app.route('/')
 def index():
-  rides = execute_query(sqlqueries.get_all_rides)
+  query = request.args.get('query')
+  
+  if query == None:
+    query = '%'
+
+  rides = execute_query(sqlqueries.get_all_rides.format(query=query))
   return render_template('index.html', rides=rides)
 
 @app.route('/<path:path>')
@@ -38,7 +43,7 @@ def get_rides():
     rides = ""
     for ride in files:
       data = parser.parse_ride(ride)
-      add_ride_query = sqlqueries.add_ride.format(athlete_id=1, activity_name=data['name'], time=data['time'].strftime('%Y-%m-%d %H:%M:%S'))
+      add_ride_query = sqlqueries.add_ride.format(athlete_id=3, activity_name=data['name'], time=data['time'].strftime('%Y-%m-%d %H:%M:%S'))
       execute_query(add_ride_query) # Insert into ride table
       ride_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
 
@@ -66,6 +71,8 @@ def get_ride(ride_id):
 
   for point in datapoints:
     for key in point:
+      if point[key] == None:
+        point[key] = 0
       if key in packed_data:
         packed_data[key].append(point[key])
       else:
