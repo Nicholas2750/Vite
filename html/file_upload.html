@@ -3,6 +3,8 @@
     Upload Your Rides Here
   </div>
   <div class="card-body">
+
+    {% if user.is_authenticated %}
     <h5 class="card-title">Adding More Rides Gives You Better Analysis Result</h5>
     <form action="/ride" method="POST" enctype="multipart/form-data">
       <div class="form-group">
@@ -11,6 +13,10 @@
 
       <button type="submit" class="btn btn-primary">Upload</button>
     </form>
+    {% else %}
+    <h5>Uh oh, looks like you are not logged in.</h5>
+    <h5>Login to start uploading your rides!</h5>
+    {% endif %}
   </div>
 </div>
 
