@@ -144,7 +144,7 @@ def login():
   salt = str(execute_query(sqlqueries.get_salt.format(username=username))[0]['Salt'])
   hashed_password = hashlib.sha512((password + salt).encode('utf-8')).hexdigest()
 
-  can_login = str(execute_query(sqlqueries.login.format(username=username, hashed_password=hashed_password))[0]['COUNT(1)'])
+  can_login = int(execute_query(sqlqueries.login.format(username=username, hashed_password=hashed_password))[0]['COUNT(1)'])
 
   if can_login:
     flask_login.login_user(load_user(username), remember=True)
