@@ -14,6 +14,9 @@ add_data_point = "INSERT INTO DataPoint (TimeStamp, ActivityID, Elevation, Power
 add_race = "SQL HERE"
 add_athlete = "SQL HERE"
 update_ride = "UPDATE Ride SET ActivityName = '{activity_name}' WHERE ActivityId = {activity_id};"
+register_user = "INSERT INTO Auth (Username, Salt, Hash) VALUES ('{username}', '{salt}', '{hashed_password}')"
+get_salt = "SELECT Salt From Auth WHERE Username = '{username}'"
+login = "SELECT COUNT(1) FROM Auth WHERE Username = '{username}' AND Hash = '{hashed_password}'"
 
 '''Put Requests'''
 modify_ride = "SQL HERE" # only activity name should be able to change
