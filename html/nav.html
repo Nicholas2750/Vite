@@ -12,12 +12,19 @@
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
+
+      {% if user.is_authenticated %}
+      <li class="nav-item active">
+        <a class="btn btn-link" href="/logout">Logout</a>
+      </li>
+      {% else %}
       <li class="nav-item active">
         <a class="btn btn-link" href="/register">Register</a>
       </li>
       <li class="nav-item active">
         <a class="btn btn-link" href="/login">Login</a>
       </li>
+      {% endif %}
     </ul>
   </div>
 </nav>
