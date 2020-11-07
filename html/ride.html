@@ -4,6 +4,7 @@
 <div class="container">
   <h2 class="my-4"> {{ ride.ActivityName }} </h2>
 
+  <canvas id="MapChart"></canvas>
   <canvas id="latitudeChart"></canvas>
   <canvas id="longitudeChart"></canvas>
   <canvas id="elevationChart"></canvas>
@@ -24,6 +25,27 @@
 {% include 'foot.html' %}
 <script>
 let seconds = Array.from({{ datapoints.Elevation }}.keys());
+let longitude = {{datapoints.Longitude}};
+let latitude = {{datapoints.Latitude}};
+
+let map = [];
+for (var i = 0; i < longitude.length; i++) {
+	const obj = {x : longitude[i], y : latitude[i]};
+	map.push(obj);
+}
+
+new Chart(document.getElementById('MapChart').getContext('2d'), {
+    type: 'scatter',
+    data: {
+        labels: {{datapoints.Longitude}},
+        datasets: [{
+            label: 'Latitude',
+            borderColor: 'red',
+            data: map
+        }]
+    },
+});
+
 new Chart(document.getElementById('latitudeChart').getContext('2d'), {
     type: 'line',
     data: {
