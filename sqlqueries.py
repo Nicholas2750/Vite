@@ -27,4 +27,5 @@ modify_athlete = "SQL HERE" # only age, name can change
 delete_ride = "DELETE FROM Ride WHERE ActivityId = {activity_id};"
 delete_athlete = "SQL HERE"
 
-
+'''Calorie Calculation'''
+calculate_calories = "SELECT ((SUM(Power) / 1000 * 4.184) * {efficiency_value}) FROM DataPoint WHERE ActivityId = {activity_id};"

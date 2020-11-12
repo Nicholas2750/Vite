@@ -95,8 +95,10 @@ def get_rides():
 
 @app.route('/ride/<path:ride_id>', methods=['GET'])
 def get_ride(ride_id):
+  HUMAN_EFFICIENCY_LEVEL = 0.22
   ride = execute_query(sqlqueries.get_ride.format(activity_id=ride_id))[0]
   datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id))
+  calorie_count = execute_query(sqlqueries.calculate_calories.format(efficiency_value=HUMAN_EFFICIENCY_LEVEL, activity_id=ride_id))
 
   packed_data = {}
 
@@ -109,7 +111,9 @@ def get_ride(ride_id):
       else:
         packed_data[key] = [point[key]]
 
-  return render_template('ride.html', ride=ride, datapoints=packed_data)
+  calorie_count = [int(calorie_count[0][list(calorie_count[0].keys())[0]])]
+  calorie_count.append(round(calorie_count[0] / 563, 1))  # Amount of Big Mac's burned
+  return render_template('ride.html', ride=ride, datapoints=packed_data, calorie_count=calorie_count)
 
 @app.route('/delete/ride/<path:ride_id>', methods=['POST'])
 def delete_ride(ride_id):
