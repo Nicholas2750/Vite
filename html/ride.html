@@ -3,8 +3,11 @@
 
 <div class="container">
   <h2 class="my-4"> {{ ride.ActivityName }} </h2>
-  <p> Calories Burned: {{ calorie_count.0 }} </p>
-  <p> Equal to {{ calorie_count.1 }} McDonald's Big Mac's!</p>
+  {%if calorie_count != None %}
+	  <p> Calories Burned: {{ calorie_count.0 }} </p>
+	  <p> Equal to {{ calorie_count.1 }} McDonald's Big Mac's!</p>
+  {% else %}
+  {% endif %}
 
   <canvas id="MapChart"></canvas>
   <canvas id="latitudeChart"></canvas>

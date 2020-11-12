@@ -111,8 +111,12 @@ def get_ride(ride_id):
       else:
         packed_data[key] = [point[key]]
 
-  calorie_count = [int(calorie_count[0][list(calorie_count[0].keys())[0]])]
-  calorie_count.append(round(calorie_count[0] / 563, 1))  # Amount of Big Mac's burned
+  calorie_val = calorie_count[0][list(calorie_count[0].keys())[0]]
+  if calorie_val:
+    calorie_count = [int(calorie_count[0][list(calorie_count[0].keys())[0]])]
+    calorie_count.append(round(calorie_count[0] / 563, 1))  # Amount of Big Mac's burned
+  else:
+    calorie_count = None
   return render_template('ride.html', ride=ride, datapoints=packed_data, calorie_count=calorie_count)
 
 @app.route('/delete/ride/<path:ride_id>', methods=['POST'])
