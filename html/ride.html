@@ -3,9 +3,14 @@
 
 <div class="container">
   <h2 class="my-4"> {{ ride.ActivityName }} </h2>
-  {%if calorie_count != None %}
-	  <p> Calories Burned: {{ calorie_count.0 }} </p>
-	  <p> Equal to {{ calorie_count.1 }} McDonald's Big Mac's!</p>
+  {%if stats.1 != None %}
+	  <p> Elapsed Time: {{ stats.1 }} </p>
+  {% else %}
+  {% endif %}
+
+  {%if stats.0 != None %}
+	  <p> Calories Burned: {{ stats.0.0 }} </p>
+	  <p> Equal to {{ stats.0.1 }} McDonald's Big Mac's!</p>
   {% else %}
   {% endif %}
 

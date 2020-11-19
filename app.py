@@ -122,8 +122,22 @@ def get_ride(ride_id):
     datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=300))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=15))
 
+  stats=[]
   calorie_count = execute_query(sqlqueries.calculate_calories.format(efficiency_value=HUMAN_EFFICIENCY_LEVEL, activity_id=ride_id))
   calorie_val = calorie_count[0][list(calorie_count[0].keys())[0]]
+
+  if calorie_val:
+    calorie_count = [int(calorie_count[0][list(calorie_count[0].keys())[0]])]
+    calorie_count.append(round(calorie_count[0] / 563, 1))  # Amount of Big Mac's burned
+  else:
+    calorie_count = None
+  stats.append(calorie_count)
+
+  elapsed_time = execute_query(sqlqueries.get_elapsed_time.format(activity_id=ride_id, row_count=data_point_count-1))
+
+  start_time = elapsed_time[0]['TimeStamp']
+  end_time = elapsed_time[1]['TimeStamp']
+  stats.append(str(end_time - start_time))
 
   latitude_longitude = {}
   for point in lat_long_data:
@@ -144,12 +158,7 @@ def get_ride(ride_id):
       else:
         packed_data[key] = [point[key]]
 
-  if calorie_val:
-    calorie_count = [int(calorie_count[0][list(calorie_count[0].keys())[0]])]
-    calorie_count.append(round(calorie_count[0] / 563, 1))  # Amount of Big Mac's burned
-  else:
-    calorie_count = None
-  return render_template('ride.html', ride=ride, datapoints=packed_data, calorie_count=calorie_count, latitude_longitude=latitude_longitude)
+  return render_template('ride.html', ride=ride, datapoints=packed_data, calorie_count=calorie_count, latitude_longitude=latitude_longitude, stats=stats)
 
 @app.route('/delete/ride/<path:ride_id>', methods=['POST'])
 def delete_ride(ride_id):
