@@ -5,7 +5,8 @@ get_all_rides = "SELECT ActivityId, ActivityName FROM Ride WHERE ActivityName LI
 get_ride = "SELECT ActivityId, ActivityName FROM Ride WHERE ActivityId = {activity_id};"
 get_race = "SQL HERE"
 get_athlete = "SQL HERE"
-get_data_point = "SELECT * FROM DataPoint WHERE ActivityID = {activity_id};"
+get_data_point = "SELECT * FROM (SELECT @row := @row + 1 AS rownum, TimeStamp, ActivityID, Elevation, Power, Temperature, Cadence, Latitude, Longitude, Heartrate FROM ( SELECT @row:=0) r, DataPoint) ranked WHERE rownum % {interval} = 1 AND ActivityID = {activity_id};"
+get_lat_long = "SELECT Latitude, Longitude FROM (SELECT @row := @row + 1 AS rownum, ActivityID, Latitude, Longitude FROM ( SELECT @row:=0) r, DataPoint) ranked WHERE rownum % {interval} = 1 AND ActivityID={activity_id};"
 
 '''Post Requests'''
 add_ride = "INSERT INTO Ride (AthleteID, ActivityName, Time) VALUES ({athlete_id}, '{activity_name}', '{time}');"
@@ -28,4 +29,7 @@ delete_ride = "DELETE FROM Ride WHERE ActivityId = {activity_id};"
 delete_athlete = "SQL HERE"
 
 '''Calorie Calculation'''
-calculate_calories = "SELECT ((SUM(Power) / 1000 * 4.184) * {efficiency_value}) FROM DataPoint WHERE ActivityId = {activity_id};"
+calculate_calories = "SELECT ((SUM(Power) / 1000 * 4.184) * {efficiency_value}) FROM DataPoint WHERE ActivityId={activity_id};"
+
+'''Utils'''
+get_row_count = "SELECT COUNT(TimeStamp) FROM {Table} WHERE ActivityID = {activity_id};"
