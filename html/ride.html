@@ -15,7 +15,6 @@
   {% endif %}
 
   {% include '3d-map.html' %}
-  <canvas id="MapChart"></canvas>
   <canvas id="latitudeChart"></canvas>
   <canvas id="longitudeChart"></canvas>
   <canvas id="elevationChart"></canvas>
@@ -40,32 +39,19 @@ let latitude = {{datapoints.Latitude}};
 let elevation = {{datapoints.Elevation}};
 let seconds = Array.from(latitude.keys());
 
-let map = [];
-for (var i = 0; i < longitude.length; i++) {
-	const obj = {x : longitude[i], y : latitude[i]};
-	map.push(obj);
-}
-
-new Chart(document.getElementById('MapChart').getContext('2d'), {
-    type: 'scatter',
-    data: {
-        labels: {{latitude_longitude.Longitude}},
-        datasets: [{
-            label: 'Route',
-            borderColor: 'black',
-            data: map
-        }]
-    },
-});
+let smooth_latitude = {{smooth_datapoints.Latitude}};
+let smooth_longitude = {{smooth_datapoints.Longitude}};
+let smooth_elevation = {{smooth_datapoints.Elevation}};
+let smooth_seconds = Array.from(smooth_latitude.keys());
 
 new Chart(document.getElementById('latitudeChart').getContext('2d'), {
     type: 'line',
     data: {
-        labels: seconds,
+        labels: smooth_seconds,
         datasets: [{
             label: 'Latitude',
             borderColor: 'red',
-            data: latitude
+            data: smooth_latitude
         }]
     },
 });
@@ -73,11 +59,11 @@ new Chart(document.getElementById('latitudeChart').getContext('2d'), {
 new Chart(document.getElementById('longitudeChart').getContext('2d'), {
     type: 'line',
     data: {
-        labels: seconds,
+        labels: smooth_seconds,
         datasets: [{
             label: 'Longitude',
             borderColor: 'green',
-            data: longitude
+            data: smooth_longitude
         }]
     },
 });
@@ -85,11 +71,11 @@ new Chart(document.getElementById('longitudeChart').getContext('2d'), {
 new Chart(document.getElementById('elevationChart').getContext('2d'), {
     type: 'line',
     data: {
-        labels: seconds,
+        labels: smooth_seconds,
         datasets: [{
             label: 'Elevation',
             borderColor: 'blue',
-            data: elevation
+            data: smooth_elevation
         }]
     },
 });
@@ -97,11 +83,11 @@ new Chart(document.getElementById('elevationChart').getContext('2d'), {
 new Chart(document.getElementById('temperatureChart').getContext('2d'), {
     type: 'line',
     data: {
-        labels: seconds,
+        labels: smooth_seconds,
         datasets: [{
             label: 'Temperature',
             borderColor: 'orange',
-            data: {{ datapoints.Temperature }}
+            data: {{ smooth_datapoints.Temperature }}
         }]
     },
 });
@@ -109,11 +95,11 @@ new Chart(document.getElementById('temperatureChart').getContext('2d'), {
 new Chart(document.getElementById('heartRateChart').getContext('2d'), {
     type: 'line',
     data: {
-        labels: seconds,
+        labels: smooth_seconds,
         datasets: [{
             label: 'Heart Rate',
             borderColor: 'pink',
-            data: {{ datapoints.Heartrate }}
+            data: {{ smooth_datapoints.Heartrate }}
         }]
     },
 });
@@ -121,11 +107,11 @@ new Chart(document.getElementById('heartRateChart').getContext('2d'), {
 new Chart(document.getElementById('powerChart').getContext('2d'), {
     type: 'line',
     data: {
-        labels: seconds,
+        labels: smooth_seconds,
         datasets: [{
             label: 'Power',
             borderColor: 'purple',
-            data: {{ datapoints.Power }}
+            data: {{ smooth_datapoints.Power }}
         }]
     },
 });
@@ -133,11 +119,11 @@ new Chart(document.getElementById('powerChart').getContext('2d'), {
 new Chart(document.getElementById('cadenceChart').getContext('2d'), {
     type: 'line',
     data: {
-        labels: seconds,
+        labels: smooth_seconds,
         datasets: [{
             label: 'Cadence',
             borderColor: 'teal',
-            data: {{ datapoints.Cadence }}
+            data: {{ smooth_datapoints.Cadence }}
         }]
     },
 });
