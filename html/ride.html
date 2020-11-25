@@ -9,6 +9,7 @@
   {% else %}
   {% endif %}
 
+  {% include '3d-map.html' %}
   <canvas id="MapChart"></canvas>
   <canvas id="latitudeChart"></canvas>
   <canvas id="longitudeChart"></canvas>
@@ -29,9 +30,10 @@
 
 {% include 'foot.html' %}
 <script>
-let seconds = Array.from({{ datapoints.Elevation }}.keys());
 let longitude = {{datapoints.Longitude}};
 let latitude = {{datapoints.Latitude}};
+let elevation = {{datapoints.Elevation}};
+let seconds = Array.from(latitude.keys());
 
 let map = [];
 for (var i = 0; i < longitude.length; i++) {
@@ -44,8 +46,8 @@ new Chart(document.getElementById('MapChart').getContext('2d'), {
     data: {
         labels: {{datapoints.Longitude}},
         datasets: [{
-            label: 'Latitude',
-            borderColor: 'red',
+            label: 'Route',
+            borderColor: 'black',
             data: map
         }]
     },
@@ -58,7 +60,7 @@ new Chart(document.getElementById('latitudeChart').getContext('2d'), {
         datasets: [{
             label: 'Latitude',
             borderColor: 'red',
-            data: {{ datapoints.Latitude }}
+            data: latitude
         }]
     },
 });
@@ -70,7 +72,7 @@ new Chart(document.getElementById('longitudeChart').getContext('2d'), {
         datasets: [{
             label: 'Longitude',
             borderColor: 'green',
-            data: {{ datapoints.Longitude }}
+            data: longitude
         }]
     },
 });
@@ -82,7 +84,7 @@ new Chart(document.getElementById('elevationChart').getContext('2d'), {
         datasets: [{
             label: 'Elevation',
             borderColor: 'blue',
-            data: {{ datapoints.Elevation }}
+            data: elevation
         }]
     },
 });
