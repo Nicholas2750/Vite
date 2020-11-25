@@ -23,5 +23,5 @@ calculate_calories = "SELECT ((SUM(Power) / 1000 * 4.184) * {efficiency_value}) 
 
 '''Utils'''
 get_row_count = "SELECT COUNT(TimeStamp) FROM {Table} WHERE ActivityID = {activity_id};"
-get_elapsed_time = "(SELECT TimeStamp from DataPoint WHERE ActivityID=85 LIMIT 1) UNION (SELECT TimeStamp from DataPoint WHERE ActivityID={activity_id} LIMIT {row_count},1);"
+get_elapsed_time = "(SELECT TimeStamp from DataPoint WHERE ActivityID = (SELECT AthleteID FROM Auth WHERE Username='{username}') LIMIT 1) UNION (SELECT TimeStamp from DataPoint WHERE ActivityID={activity_id} LIMIT {row_count},1);"
 get_last_insert_id = "SELECT LAST_INSERT_ID();"
