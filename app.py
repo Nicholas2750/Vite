@@ -57,7 +57,7 @@ def index():
   if query == None:
     query = '%'
 
-  rides = execute_query(sqlqueries.get_all_rides.format(query=query))
+  rides = execute_query(sqlqueries.get_all_rides.format(query=query, username=flask_login.current_user.get_id()))
 
   return render_template('index.html', rides=rides)
 
@@ -74,7 +74,7 @@ def get_rides():
     rides = ""
     for ride in files:
       data = parser.parse_ride(ride)
-      add_ride_query = sqlqueries.add_ride.format(athlete_id=3, activity_name=data['name'], time=data['time'].strftime('%Y-%m-%d %H:%M:%S'))
+      add_ride_query = sqlqueries.add_ride.format(username=flask_login.current_user.get_id(), activity_name=data['name'], time=data['time'].strftime('%Y-%m-%d %H:%M:%S'))
       execute_query(add_ride_query) # Insert into ride table
       ride_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
 
@@ -98,7 +98,7 @@ def get_ride(ride_id):
   HUMAN_EFFICIENCY_LEVEL = 0.22
   MINUTE = 60
 
-  ride = execute_query(sqlqueries.get_ride.format(activity_id=ride_id))[0]
+  ride = execute_query(sqlqueries.get_ride.format(activity_id=ride_id, username=flask_login.current_user.get_id()))[0]
   data_point_count = execute_query(sqlqueries.get_row_count.format(Table="DataPoint", activity_id=ride_id))[0]['COUNT(TimeStamp)']
   datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=2))
   if 0 <= data_point_count and data_point_count < MINUTE:
@@ -173,11 +173,18 @@ def get_ride(ride_id):
 
 @app.route('/delete/ride/<path:ride_id>', methods=['POST'])
 def delete_ride(ride_id):
+  # Get ride again to assure proper access control.
+  # If user is trying to delete other people's ride, it simply sends an error back to the user.
+  execute_query(sqlqueries.get_ride.format(activity_id=ride_id, username=flask_login.current_user.get_id()))[0]
+
   execute_query(sqlqueries.delete_ride.format(activity_id=ride_id))
   return redirect('/')
 
 @app.route('/update/ride/<path:ride_id>', methods=['POST'])
 def update_ride(ride_id):
+  # Get ride again to assure proper access control.
+  # If user is trying to update other people's ride, it simply sends an error back to the user.
+  execute_query(sqlqueries.get_ride.format(activity_id=ride_id, username=flask_login.current_user.get_id()))[0]
   new_name = request.form['newname']
   execute_query(sqlqueries.update_ride.format(activity_id=ride_id, activity_name=new_name))
   return redirect(f'/ride/{ride_id}')
@@ -191,7 +198,10 @@ def register():
   salt = str(uuid.uuid4())
   hashed_password = hashlib.sha512((password + salt).encode('utf-8')).hexdigest()
 
-  execute_query(sqlqueries.register_user.format(username=username, salt=salt, hashed_password=hashed_password))
+  execute_query(sqlqueries.add_athlete)
+  athlete_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
+
+  execute_query(sqlqueries.register_user.format(username=username, salt=salt, hashed_password=hashed_password, athlete_id=athlete_id))
 
   return redirect('/login')
 
