@@ -1,0 +1,118 @@
+<script id="shader-vs" type="x-shader/x-vertex">
+  attribute vec3 aVertexNormal;
+    attribute vec3 aVertexPosition;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat3 uNMatrix;
+
+    varying vec3 vNormalInit;
+    varying vec3 vPosition;
+    varying vec3 lightPos;
+    varying float vElevation;
+
+    void main(void) {
+
+      // Get the vertex position in eye coordinates
+      vElevation = aVertexPosition.z;
+      vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
+      vPosition = vertexPositionEye4.xyz / vertexPositionEye4.w;
+
+      // Transform the normal (n) to view coordinates
+      vNormalInit = uNMatrix * aVertexNormal;
+      gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+    }
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+  precision mediump float;
+    varying vec3 vPosition;
+    varying vec3 vNormalInit;
+    varying float vElevation;
+
+    uniform vec3 uLightPosition;
+    uniform vec3 uAmbientLightColor;
+    uniform vec3 uDiffuseLightColor;
+    uniform vec3 uSpecularLightColor;
+
+    uniform vec3 uKAmbient;
+    uniform vec3 uKDiffuse;
+    uniform vec3 uKSpecular;
+    uniform float uShininess;
+    uniform float minElevation;
+    uniform float maxElevation;
+    uniform bool fogEnable;
+
+    void main(void) {
+      vec3 vectorToLightSource = normalize(uLightPosition - vPosition);
+      vec3 vNormal = normalize(vNormalInit);
+      vec3 elevationColor = uKDiffuse;
+      float factor = (vElevation - minElevation) / (maxElevation - minElevation);
+      elevationColor.x = 0.5;
+      elevationColor.y = 0.7;
+      elevationColor.z = 0.9;
+
+      if (factor > 0.0) {
+        elevationColor.x = 0.8;
+        elevationColor.y = 1.0;
+        elevationColor.z = 0.8;
+      }
+
+      float diffuseLightWeighting = max(dot(vNormal, vectorToLightSource), 0.0);
+
+      vec3 reflectionVector = normalize(reflect(-vectorToLightSource, vNormal));
+
+      vec3 viewVectorEye = -normalize(vPosition);
+
+      float rdotv = max(dot(reflectionVector, viewVectorEye), 0.0);
+
+      float specularLightWeighting = pow(rdotv, uShininess);
+
+      float fogCoord = (gl_FragCoord.z/gl_FragCoord.w);
+      vec4 fogColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+      vec4 fragColor =
+        vec4(((uAmbientLightColor*uKAmbient)
+              + (uDiffuseLightColor*elevationColor) * diffuseLightWeighting
+              + (uSpecularLightColor*elevationColor) * specularLightWeighting),1.0);
+
+      if (fogEnable) {
+        const float LOG2 = 1.442695;
+        float fogDensity = 0.8;
+        float fogFactor = exp2(-fogDensity * fogDensity * fogCoord * fogCoord * LOG2);
+        fogFactor = clamp(fogFactor, 0.0, 1.0);
+        gl_FragColor = mix(fogColor, fragColor, fogFactor);
+      } else {
+        gl_FragColor = fragColor;
+      }
+    }
+</script>
+
+<script src="/static/js/gl-matrix-min.js"></script>
+<script src="/static/js/terrain.js"></script>
+<script src="/static/js/3d-map.js"></script>
+
+<div onload="startup();">
+  <div style="border: 1px solid black; padding: 15px">
+    Flight simulator controls:<br/>
+    <strong>W</strong>: Pitch up<span style="padding:20px"></span>
+    <strong>S</strong>: Pitch down<span style="padding:20px"></span>
+    <strong>Q</strong>: Roll left<span style="padding:20px"></span>
+    <strong>E</strong>: Roll right<span style="padding:20px"></span>
+    <strong>A</strong>: Yaw left<span style="padding:20px"></span>
+    <strong>D</strong>: Yaw right<span style="padding:20px"></span>
+    <strong>1</strong>: Move forward<span style="padding:20px"></span>
+    <strong>2</strong>: Move backward<span style="padding:20px"></span>
+    <p></p>
+  </div>
+  <canvas id="myGLCanvas" width="800" height="800"></canvas>
+  <form id="input_form">
+    <fieldset>
+      <legend>Rendering Parameters</legend>
+      <input type="radio" name="primitive" id="wireframe" value="wireframe"> Wireframe
+      <input type="radio" name="primitive" id="polygon" id="polygon" value="polygon" checked> Polygon
+      <input type="radio" name="primitive" id="wirepoly" value="wirepoly" > Polygon with Edges
+      <input type="checkbox" name="primitive" id="fogCheckbox" onclick="toggleFog()"/> Fog
+    </fieldset>
+  </form>
+</div>
