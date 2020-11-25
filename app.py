@@ -100,26 +100,27 @@ def get_ride(ride_id):
 
   ride = execute_query(sqlqueries.get_ride.format(activity_id=ride_id))[0]
   data_point_count = execute_query(sqlqueries.get_row_count.format(Table="DataPoint", activity_id=ride_id))[0]['COUNT(TimeStamp)']
+  datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=2))
   if 0 <= data_point_count and data_point_count < MINUTE:
-    datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=1))
+    smoothed_data = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=1))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=1))
   elif MINUTE < data_point_count and data_point_count <= 2 * MINUTE:
-    datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=5))
+    smoothed_data = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=5))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=2))
   elif 2 * MINUTE < data_point_count and data_point_count < 5 * MINUTE:
-    datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=10))
+    smoothed_data = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=10))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=4))
   elif 5 * MINUTE <= data_point_count and data_point_count < 10 * MINUTE:
-    datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=30))
+    smoothed_data = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=30))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=6))
   elif 10 * MINUTE <= data_point_count and data_point_count < 60 * MINUTE:
-    datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=60))
+    smoothed_data = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=60))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=8))
   elif 60 * MINUTE <= data_point_count and data_point_count < 120 * MINUTE:
-    datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=90))
+    smoothed_data = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=90))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=10))
   else: # Over 2 hours
-    datapoints = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=300))
+    smoothed_data = execute_query(sqlqueries.get_data_point.format(activity_id=ride_id, interval=300))
     lat_long_data = execute_query(sqlqueries.get_lat_long.format(activity_id=ride_id, interval=15))
 
   stats=[]
@@ -158,7 +159,17 @@ def get_ride(ride_id):
       else:
         packed_data[key] = [point[key]]
 
-  return render_template('ride.html', ride=ride, datapoints=packed_data, calorie_count=calorie_count, latitude_longitude=latitude_longitude, stats=stats)
+  packed_smooth_data = {}
+  for point in smoothed_data:
+    for key in point:
+      if point[key] == None:
+        point[key] = 0
+      if key in packed_smooth_data:
+        packed_smooth_data[key].append(point[key])
+      else:
+        packed_smooth_data[key] = [point[key]]
+
+  return render_template('ride.html', ride=ride, datapoints=packed_data, calorie_count=calorie_count, latitude_longitude=latitude_longitude, stats=stats, smooth_datapoints=packed_smooth_data)
 
 @app.route('/delete/ride/<path:ride_id>', methods=['POST'])
 def delete_ride(ride_id):
