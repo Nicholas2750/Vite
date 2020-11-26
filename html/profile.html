@@ -1,18 +1,19 @@
 {% include 'head.html' %}
 {% include 'nav.html' %}
 
-<div class="container">
+<div class="container my-4">
+  {% include 'alert.html' %}
   <div class="card my-5">
     <h5 class="card-header">Your Profile</h5>
     <div class="card-body">
-      <form action="/login" method="POST">
+      <form action="/profile" method="POST">
         <div class="form-group">
           <label>Name</label>
-          <input type="text" class="form-control" name="username" placeholder="">
+          <input type="text" class="form-control" name="name" placeholder="{{ profile.Name }}">
         </div>
         <div class="form-group">
           <label>Date of Birth (YYYY-MM-DD)</label>
-          <input type="password" class="form-control" name="password" placeholder="">
+          <input type="password" class="form-control" name="dateofbirth" placeholder="{{ profile.DateOfBirth }}">
         </div>
         <input type="submit" class="btn btn-primary" value="Update"></input>
       </form>
