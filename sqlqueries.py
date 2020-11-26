@@ -30,6 +30,12 @@ get_lat_long    = """
                      ) ranked 
                 WHERE rownum % {interval} = 1 AND ActivityID={activity_id};"""
 
+get_profile     = """
+                SELECT Name, DateOfBirth
+                FROM Athlete NATURAL JOIN Auth
+                WHERE Username='{username}';
+                """
+
 
 '''Post Requests'''
 add_ride        = """
@@ -67,6 +73,16 @@ login           = """
 
 add_athlete     = """
                 INSERT INTO Athlete VALUES()
+                """
+
+update_profile  = """
+                UPDATE Athlete
+                SET Name = '{name}', DateOfBirth = '{dateofbirth}'
+                WHERE AthleteID = (
+                                    SELECT AthleteID
+                                    FROM Auth
+                                    WHERE Username = '{username}'
+                                  );
                 """
 
 
