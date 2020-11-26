@@ -36,6 +36,41 @@ get_profile     = """
                 WHERE Username='{username}';
                 """
 
+agg_user_data_point  = """
+                     SELECT AVG(Latitude) AS AVGLatitude,
+                            AVG(Longitude) AS AVGLongitude,
+                            AVG(Elevation) AS AVGElevation,
+                            AVG(Power) AS AVGPower,
+                            AVG(Temperature) AS AVGTemperature,
+                            AVG(Cadence) AS AVGCadence,
+                            AVG(Heartrate) AS AVGHeartrate,
+
+                            MIN(Latitude) AS MINLatitude,
+                            MIN(Longitude) AS MINLongitude,
+                            MIN(Elevation) AS MINElevation,
+                            MIN(Power) AS MINPower,
+                            MIN(Temperature) AS MINTemperature,
+                            MIN(Cadence) AS MINCadence,
+                            MIN(Heartrate) AS MINHeartrate,
+
+                            MAX(Latitude) AS MAXLatitude,
+                            MAX(Longitude) AS MAXLongitude,
+                            MAX(Elevation) AS MAXElevation,
+                            MAX(Power) AS MAXPower,
+                            MAX(Temperature) AS MAXTemperature,
+                            MAX(Cadence) AS MAXCadence,
+                            MAX(Heartrate) AS MAXHeartrate,
+
+                            SUM(Power) AS SUMPower
+
+                     FROM DataPoint
+                     WHERE ActivityID IN (
+                        SELECT ActivityID
+                        FROM Ride NATURAL JOIN Athlete NATURAL JOIN Auth
+                        WHERE Username='{username}'
+                     );
+                     """
+
 
 '''Post Requests'''
 add_ride        = """
