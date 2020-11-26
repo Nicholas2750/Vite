@@ -1,0 +1,23 @@
+{% include 'head.html' %}
+{% include 'nav.html' %}
+
+<div class="container">
+  <div class="card my-5">
+    <h5 class="card-header">Your Profile</h5>
+    <div class="card-body">
+      <form action="/login" method="POST">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" class="form-control" name="username" placeholder="">
+        </div>
+        <div class="form-group">
+          <label>Date of Birth (YYYY-MM-DD)</label>
+          <input type="password" class="form-control" name="password" placeholder="">
+        </div>
+        <input type="submit" class="btn btn-primary" value="Update"></input>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% include 'foot.html' %}
