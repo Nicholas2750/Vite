@@ -200,7 +200,10 @@ def register():
   execute_query(sqlqueries.add_athlete)
   athlete_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
 
-  execute_query(sqlqueries.register_user.format(username=username, salt=salt, hashed_password=hashed_password, athlete_id=athlete_id))
+  try:
+    execute_query(sqlqueries.register_user.format(username=username, salt=salt, hashed_password=hashed_password, athlete_id=athlete_id))
+  except:
+    return render_template('register.html', alert="An account with the same username already exists")
 
   return redirect('/login')
 
@@ -217,8 +220,10 @@ def login():
 
   if can_login:
     flask_login.login_user(load_user(username), remember=True)
+    return redirect('/')
+  
+  return render_template('login.html', alert="You have entered the wrong username / password")
 
-  return redirect('/')
 
 @app.route('/logout', methods=['GET'])
 def logout():
