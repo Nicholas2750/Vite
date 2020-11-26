@@ -1,13 +1,13 @@
 {% if user.is_authenticated %}
 <h3 class="mb-4">Your Rides</h3>
 
+  {% if rides %}
 <form action="/" method="GET" enctype="multipart/form-data">
   <p class="lead">Search for a specific ride:</p>
   <input type="text" name="query"></input>
   <button class="btn btn-success">Search</button>
 </form>
 
-  {% if rides %}
     {% for ride in rides %}
     - <a class="btn btn-link" href="/ride/{{ ride.ActivityId }}">{{ride.ActivityName}}</a>
     <br>
@@ -15,5 +15,8 @@
   {% else %}
     <h5>You have not uploaded any rides yet.</h5>
     <h5>Start uploading some rides to look at your stats!</h5>
+    <br>
+    <h5>Don't have any rides to upload?</h5>
+    <a href="/static/sample_ride.gpx"><h5>Try uploading our sample ride!</h5></a>
   {% endif %}
 {% endif %}
