@@ -19,6 +19,59 @@
       </form>
     </div>
   </div>
+
+  <h4>Your All-Time Statistics:</h4>
+  <h5>Latitude:</h5>
+  <ul>
+    <li>Maximum Latitude Reached        : {{ stats.MAXLatitude }}</li>
+    <li>Minimum Latitude Reached        : {{ stats.MINLatitude }}</li>
+    <li>Average Latitude During Rides   : {{ stats.AVGLatitude }}</li>
+  </ul>
+  <br>
+  <h5>Longitude:</h5>
+  <ul>
+    <li>Maximum Longitude Reached        : {{ stats.MAXLongitude }}</li>
+    <li>Minimum Longitude Reached        : {{ stats.MINLongitude }}</li>
+    <li>Average Longitude During Rides   : {{ stats.AVGLongitude }}</li>
+  </ul>
+  <br>
+  <h5>Elevation:</h5>
+  <ul>
+    <li>Highest Elevation Reached       : {{ stats.MAXElevation }}</li>
+    <li>Lowest Elevation Reached        : {{ stats.MINElevation }}</li>
+    <li>Average Elevation During Rides  : {{ stats.AVGElevation }}</li>
+  </ul>
+  <br>
+  <h5>Temperature:</h5>
+  <ul>
+    <li>Highest Temperature Experienced     : {{ stats.MAXTemperature }} {% if stats.MAXTemperature != None %}°C{% endif %}</li>
+    <li>Lowest Temperature Experienced      : {{ stats.MINTemperature }} {% if stats.MINTemperature != None %}°C{% endif %}</li>
+    <li>Average Temperature During Rides    : {{ stats.AVGTemperature }} {% if stats.AVGTemperature != None %}°C{% endif %}</li>
+  </ul>
+  <br>
+  <h5>Heartrate:</h5>
+  <ul>
+    <li>Highest Heartrate Reached       : {{ stats.MAXHeartrate }} {% if stats.MAXHeartrate != None %}Heartbeat / Minute{% endif %}</li>
+    <li>Lowest Heartrate Reached        : {{ stats.MINHeartrate }} {% if stats.MINHeartrate != None %}Heartbeat / Minute{% endif %}</li>
+    <li>Average Heartrate During Rides  : {{ stats.AVGHeartrate }} {% if stats.AVGHeartrate != None %}Heartbeat / Minute{% endif %}</li>
+  </ul>
+  <br>
+  <h5>Cadence:</h5>
+  <ul>
+    <li>Highest Cadence Reached       : {{ stats.MAXCadence }} {% if stats.MAXCadence != None %}Revolutions / Minute{% endif %}</li>
+    <li>Lowest Cadence Reached        : {{ stats.MINCadence }} {% if stats.MINCadence != None %}Revolutions / Minute{% endif %}</li>
+    <li>Average Cadence During Rides  : {{ stats.AVGCadence }} {% if stats.AVGCadence != None %}Revolutions / Minute{% endif %}</li>
+  </ul>
+  <br>
+  <h5>Power:</h5>
+  <ul>
+    <li>Highest Power Reached       : {{ stats.MAXPower }} {% if stats.MAXPower != None %}Watts{% endif %}</li>
+    <li>Lowest Power Reached        : {{ stats.MINPower }} {% if stats.MINPower != None %}Watts{% endif %}</li>
+    <li>Average Power During Rides  : {{ stats.AVGPower }} {% if stats.AVGPower != None %}Watts{% endif %}</li>
+    <li>Total Power Generated       : {{ stats.SUMPower }} {% if stats.SUMPower != None %}Watts{% endif %}</li>
+  </ul>
+
 </div>
+
 
 {% include 'foot.html' %}
