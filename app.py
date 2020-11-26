@@ -230,11 +230,13 @@ def logout():
   flask_login.logout_user()
   return redirect('/')
 
+
 @app.route('/profile', methods=['GET'])
 def get_profile():
   profile = execute_query(sqlqueries.get_profile.format(username=flask_login.current_user.get_id()))[0]
+  stats = execute_query(sqlqueries.agg_user_data_point.format(username=flask_login.current_user.get_id()))[0]
 
-  return render_template('profile.html', profile=profile)
+  return render_template('profile.html', profile=profile, stats=stats)
 
 
 @app.route('/profile', methods=['POST'])
@@ -253,7 +255,9 @@ def update_profile():
 
   except:
     profile = execute_query(sqlqueries.get_profile.format(username=flask_login.current_user.get_id()))[0]
-    return render_template('profile.html', profile=profile, alert="You input was not formatted correctly")
+    stats = execute_query(sqlqueries.agg_user_data_point.format(username=flask_login.current_user.get_id()))
+
+    return render_template('profile.html', profile=profile, stats=stats, alert="You input was not formatted correctly")
 
 
 if __name__ == '__main__':
