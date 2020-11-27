@@ -1,9 +1,11 @@
 from flask import Flask, request, render_template, redirect
 from flask_mysqldb import MySQL
+from pymongo import MongoClient
 import flask_login
 import hashlib, uuid
 import gpxpy
 import sqlqueries
+import mongoqueries
 import parser
 import os
 
@@ -14,7 +16,9 @@ app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'vite_data'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.secret_key = os.urandom(24)
+
 mysql = MySQL(app)
+mongo = MongoClient('localhost', 27017)
 login_manager = flask_login.LoginManager(app)
 
 class User(flask_login.UserMixin):
@@ -78,6 +82,14 @@ def get_rides():
       execute_query(add_ride_query) # Insert into ride table
       ride_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
 
+      athlete_id = execute_query(sqlqueries.get_user.format(username=flask_login.current_user.get_id()))[0]['AthleteID']
+      mongo.db.Ride.insert({
+          "ActivityID": ride_id, 
+          "AthleteID": athlete_id, 
+          "ActivityName": data['name'], 
+          "Time": data['time']
+      })
+        
       for datapoint in data['datapoints']: # Insert data points 
         add_data_point = sqlqueries.add_data_point.format(time_stamp=datapoint.get('time', 'null'), 
             activity_id=ride_id, 
@@ -89,6 +101,18 @@ def get_rides():
             longitude=datapoint.get('longitude', 'null'), 
             heartrate=datapoint.get('heartrate', 'null'))
         execute_query(add_data_point)
+        
+        mongo.db.DataPoint.insert({
+            "TimeStamp": datapoint.get('time', None), 
+            "ActivityID": ride_id, 
+            "Elevation": datapoint.get('elevation', None), 
+            "Power": datapoint.get('power', None), 
+            "Temperature": datapoint.get('temperature', None), 
+            "Cadence": datapoint.get('cadence', None), 
+            "Latitude": datapoint.get('latitude', None), 
+            "Longitude": datapoint.get('longitude', None), 
+            "Heartrate": datapoint.get('heartrate', None)
+        })
     return redirect('/')
 
   return None
@@ -177,6 +201,10 @@ def delete_ride(ride_id):
   execute_query(sqlqueries.get_ride.format(activity_id=ride_id, username=flask_login.current_user.get_id()))[0]
 
   execute_query(sqlqueries.delete_ride.format(activity_id=ride_id))
+    
+  mongo.db.Ride.delete_one({"ActivityID": int(ride_id)})
+  mongo.db.DataPoint.delete_many({"ActivityID": int(ride_id)})
+    
   return redirect('/')
 
 @app.route('/update/ride/<path:ride_id>', methods=['POST'])
@@ -186,6 +214,9 @@ def update_ride(ride_id):
   execute_query(sqlqueries.get_ride.format(activity_id=ride_id, username=flask_login.current_user.get_id()))[0]
   new_name = request.form['newname']
   execute_query(sqlqueries.update_ride.format(activity_id=ride_id, activity_name=new_name))
+
+  mongo.db.Ride.update_one({"ActivityID": int(ride_id)}, {"$set": {"ActivityName": new_name}})
+
   return redirect(f'/ride/{ride_id}')
 
 
@@ -199,9 +230,11 @@ def register():
 
   execute_query(sqlqueries.add_athlete)
   athlete_id = execute_query(sqlqueries.get_last_insert_id)[0]['LAST_INSERT_ID()'] # Get ride_id
+  mongo.db.Athlete.insert({"AthleteID": athlete_id})
 
   try:
     execute_query(sqlqueries.register_user.format(username=username, salt=salt, hashed_password=hashed_password, athlete_id=athlete_id))
+    mongo.db.Auth.insert({"Username": username, "Salt": salt, "Hash": hashed_password, "AthleteID": athlete_id})
   except:
     return render_template('register.html', alert="An account with the same username already exists")
 
@@ -250,6 +283,10 @@ def update_profile():
       name=name,
       dateofbirth=dateofbirth
       ))
+    
+    athlete_id = execute_query(sqlqueries.get_user.format(username=flask_login.current_user.get_id()))[0]['AthleteID']
+    mongo.db.Athlete.update_one({"AthleteID": athlete_id}, 
+                                {"$set": {"Name": name, "DateOfBirth": dateofbirth}})
 
     return redirect('/profile')
 

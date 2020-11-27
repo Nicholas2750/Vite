@@ -1,6 +1,8 @@
 # SQL Queries
 
 '''Get Requests'''
+get_user = "SELECT * FROM Auth WHERE username = '{username}'"
+
 get_all_rides   = """
                 SELECT ActivityId, ActivityName
                 FROM Ride NATURAL JOIN Athlete NATURAL JOIN Auth

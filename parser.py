@@ -21,11 +21,13 @@ def parse_ride(file_content):
 
         for extension in point.extensions:
           if extension.tag in ['heartrate', 'cadence', 'power']:
-            datapoint[extension.tag] = extension.text
+            if extension.text != 'null':
+                datapoint[extension.tag] = float(extension.text)
 
           # Strava's temperature data point in the GPX is misformatted.
           if 'Temperature' in extension.tag:
-            datapoint['temperature'] = extension.text
+            if extension.text != 'null':
+                datapoint['temperature'] = float(extension.text)
 
         data['datapoints'].append(datapoint)
 
