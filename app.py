@@ -246,10 +246,13 @@ def login():
   username = request.form['username']
   password = request.form['password']
 
-  salt = str(execute_query(sqlqueries.get_salt.format(username=username))[0]['Salt'])
-  hashed_password = hashlib.sha512((password + salt).encode('utf-8')).hexdigest()
+  try:
+    salt = str(execute_query(sqlqueries.get_salt.format(username=username))[0]['Salt'])
+    hashed_password = hashlib.sha512((password + salt).encode('utf-8')).hexdigest()
 
-  can_login = int(execute_query(sqlqueries.login.format(username=username, hashed_password=hashed_password))[0]['COUNT(1)'])
+    can_login = int(execute_query(sqlqueries.login.format(username=username, hashed_password=hashed_password))[0]['COUNT(1)'])
+  except:
+    return render_template('login.html', alert="You have entered the wrong username / password")
 
   if can_login:
     flask_login.login_user(load_user(username), remember=True)
@@ -296,6 +299,45 @@ def update_profile():
 
     return render_template('profile.html', profile=profile, stats=stats, alert="You input was not formatted correctly")
 
+@app.route('/global', methods=['GET'])
+def get_global():
+  stats = {}
+
+  stats['totalmiles'] = mongoqueries.get_global_miles(mongo)
+  stats['yearlymiles'] = mongoqueries.get_global_miles_last_year(mongo)
+  stats['monthlymiles'] = mongoqueries.get_global_miles_last_month(mongo)
+  stats['weeklymiles'] = mongoqueries.get_global_miles_last_week(mongo)
+
+  stats['totalhours'] = mongoqueries.get_global_hours(mongo)
+  stats['yearlyhours'] = mongoqueries.get_global_hours_last_year(mongo)
+  stats['monthlyhours'] = mongoqueries.get_global_hours_last_month(mongo)
+  stats['weeklyhours'] = mongoqueries.get_global_hours_last_week(mongo)
+
+  stats['totalcalories'] = mongoqueries.get_global_calories(mongo)
+  stats['yearlycalories'] = mongoqueries.get_global_calories_last_year(mongo)
+  stats['monthlycalories'] = mongoqueries.get_global_calories_last_month(mongo)
+  stats['weeklycalories'] = mongoqueries.get_global_calories_last_week(mongo)
+
+  return render_template('global.html', stats=stats)
+
+@app.route('/leaderboard', methods=['GET'])
+def get_leaderboard():
+  leaderboard = mongoqueries.get_leaderboard(mongo)
+
+  return render_template('leaderboard.html', leaderboard=leaderboard)
+
+@app.route('/fame', methods=['GET'])
+def get_hall_of_fame():
+  stats = {}
+  stats['max_elevation'] = mongoqueries.get_athlete_max_elevation(mongo)
+  stats['min_elevation'] = mongoqueries.get_athlete_min_elevation(mongo)
+  stats['max_temperature'] = mongoqueries.get_athlete_max_temperature(mongo)
+  stats['min_temperature'] = mongoqueries.get_athlete_min_temperature(mongo)
+  stats['max_cadence'] = mongoqueries.get_athlete_max_cadence(mongo)
+  stats['max_power'] = mongoqueries.get_athlete_max_power(mongo)
+  stats['max_heartrate'] = mongoqueries.get_athlete_max_heartrate(mongo)
+
+  return render_template('fame.html', stats=stats)
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0')
