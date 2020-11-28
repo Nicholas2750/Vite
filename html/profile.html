@@ -37,9 +37,9 @@
   <br>
   <h5>Elevation:</h5>
   <ul>
-    <li>Highest Elevation Reached       : {{ stats.MAXElevation }}</li>
-    <li>Lowest Elevation Reached        : {{ stats.MINElevation }}</li>
-    <li>Average Elevation During Rides  : {{ stats.AVGElevation }}</li>
+    <li>Highest Elevation Reached       : {{ stats.MAXElevation }} {% if stats.MAXElevation != None %}meters above sea level{% endif %}</li>
+    <li>Lowest Elevation Reached        : {{ stats.MINElevation }} {% if stats.MINElevation != None %}meters above sea level{% endif %}</li>
+    <li>Average Elevation During Rides  : {{ stats.AVGElevation }} {% if stats.AVGElevation != None %}meters above sea level{% endif %}</li>
   </ul>
   <br>
   <h5>Temperature:</h5>
