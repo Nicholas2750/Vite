@@ -1,0 +1,64 @@
+{% include 'head.html' %}
+{% include 'nav.html' %}
+
+<div class="container">
+  <div class="card my-5">
+    <h5 class="card-header">Global Statistics</h5>
+    <div class="card-body">
+      <h5 class="card-title">Together We Can</h5>
+      <p class="card-text">In celebration of the collective efforts that everyone has made, this page displays the combined statistics of all athletes.</p>
+    </div>
+  </div>
+
+  <div class="card my-5">
+    <div class="card-body">
+      <h5 class="card-title">Weekly Statistics</h5>
+      <p class="card-text">Over the past week, as a community, we have:</p>
+      <ul>
+        <li>Travelled {{ stats.weeklymiles }} miles together.</li>
+        <li>Spent {{ stats.weeklyhours }} hours exercising together.</li>
+        <li>Burned {{ stats.weeklycalories }} calories together.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card my-5">
+    <div class="card-body">
+      <h5 class="card-title">Monthly Statistics</h5>
+      <p class="card-text">Over the past month, as a community, we have:</p>
+      <ul>
+        <li>Travelled {{ stats.monthlymiles }} miles together.</li>
+        <li>Spent {{ stats.monthlyhours }} hours exercising together.</li>
+        <li>Burned {{ stats.monthlycalories }} calories together.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card my-5">
+    <div class="card-body">
+      <h5 class="card-title">Yearly Statistics</h5>
+      <p class="card-text">Over the past year, as a community, we have:</p>
+      <ul>
+        <li>Travelled {{ stats.yearlymiles }} miles together.</li>
+        <li>Spent {{ stats.yearlyhours }} hours exercising together.</li>
+        <li>Burned {{ stats.yearlycalories }} calories together.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card my-5">
+    <div class="card-body">
+      <h5 class="card-title">All-Time Statistics</h5>
+      <p class="card-text">In total, as a community, we have:</p>
+      <ul>
+        <li>Travelled {{ stats.totalmiles }} miles together.</li>
+        <li>Spent {{ stats.totalhours }} hours exercising together.</li>
+        <li>Burned {{ stats.totalcalories }} calories together.</li>
+      </ul>
+    </div>
+  </div>
+
+
+</div>
+
+{% include 'foot.html' %}
