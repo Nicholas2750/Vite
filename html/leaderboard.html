@@ -1,0 +1,86 @@
+{% include 'head.html' %}
+{% include 'nav.html' %}
+
+<div class="container">
+  <div class="card my-5">
+    <h5 class="card-header">Leaderboard</h5>
+    <div class="card-body">
+      <h5 class="card-title">Effort is the best indicator of interest</h5>
+      <p class="card-text">In celebration of the personal effort of every single one of us, below are shown a leaderboard of who has spent the most time training.</p>
+    </div>
+  </div>
+
+  <div class="card my-5">
+    <div class="card-body">
+      <h5 class="card-title">Weekly Leaderboard</h5>
+      <p class="card-text">Over the past week, these users have spent the most time training:</p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in leaderboard.week %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ user }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card my-5">
+    <div class="card-body">
+      <h5 class="card-title">Monthly Statistics</h5>
+      <p class="card-text">Over the past month, these users have spent the most time training:</p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in leaderboard.month %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ user }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <div class="card my-5">
+    <div class="card-body">
+      <h5 class="card-title">Yearly Statistics</h5>
+      <p class="card-text">Over the past year, these users have spent the most time training:</p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in leaderboard.year %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ user }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+</div>
+
+{% include 'foot.html' %}
