@@ -97,18 +97,22 @@ def _get_calories(mongo, query):
             }},
         ]
     )
-    return (list(q)[0]['sum'] / 1000) * 4.184 * 0.22
+
+    try:
+      return (list(q)[0]['sum'] / 1000) * 4.184 * 0.22
+    except:
+      return 0
     
 
 def _get_field_max(mongo, field):
-    q = mongo.db.DataPoint.find_one({}, sort=[(field, pymongo.DESCENDING)])
+    q = mongo.db.DataPoint.find_one({field: {"$ne": None}}, sort=[(field, pymongo.DESCENDING)])
     ride_id, val = q["ActivityID"], q[field]
     athlete_id = mongo.db.Ride.find_one({"ActivityID": ride_id})["AthleteID"]
     username = mongo.db.Auth.find_one({"AthleteID": athlete_id})["Username"]
     return [username, val]
 
 def _get_field_min(mongo, field):
-    q = mongo.db.DataPoint.find_one({}, sort=[(field, pymongo.ASCENDING)])
+    q = mongo.db.DataPoint.find_one({field: {"$ne": None}}, sort=[(field, pymongo.ASCENDING)])
     ride_id, val = q["ActivityID"], q[field]
     athlete_id = mongo.db.Ride.find_one({"ActivityID": ride_id})["AthleteID"]
     username = mongo.db.Auth.find_one({"AthleteID": athlete_id})["Username"]
@@ -168,19 +172,19 @@ def get_global_calories_last_year(mongo):
         
     
 def get_global_activities(mongo):
-    return mongo.db.Ride.count_documents({})
+    return mongo.db.Ride.count()
     
     
 def get_global_activities_last_week(mongo):
-    return mongo.db.Ride.count_documents({"TimeStamp": {"$gte": datetime.now() - timedelta(days=7)}})
+    return mongo.db.Ride.count({"TimeStamp": {"$gte": datetime.now() - timedelta(days=7)}})
 
 
 def get_global_activities_last_month(mongo):
-    return mongo.db.Ride.count_documents({"TimeStamp": {"$gte": datetime.now() - timedelta(days=31)}})
+    return mongo.db.Ride.count({"TimeStamp": {"$gte": datetime.now() - timedelta(days=31)}})
 
 
 def get_global_activities_last_year(mongo):
-    return mongo.db.Ride.count_documents({"TimeStamp": {"$gte": datetime.now() - timedelta(days=365)}})
+    return mongo.db.Ride.count({"TimeStamp": {"$gte": datetime.now() - timedelta(days=365)}})
 
 
 
@@ -284,7 +288,6 @@ def get_athlete_max_hours(mongo):
     
 def get_athlete_max_elevation(mongo):
     return _get_field_max(mongo, "Elevation")
-
 
 def get_athlete_max_cadence(mongo):
     return _get_field_max(mongo, "Cadence")
