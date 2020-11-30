@@ -69,8 +69,6 @@ def execute_procedure(procedure, args=[]):
 
 @app.route('/')
 def index():
-  print (execute_procedure("calculate_cda", [170, 90, 20, 22]))
-
   query = request.args.get('query')
 
   if query == None:
@@ -187,9 +185,16 @@ def get_ride(ride_id):
 
   wind_speed = float(r['data']['weather'][0]['hourly'][0]['windspeedKmph'])
   wind_direction = r['data']['weather'][0]['hourly'][0]['winddirDegree']
-  distance = mongoqueries.get_distance_of_ride(mongo, ride['ActivityId'])   
-        
-  cdA = execute_procedure("calculate_cda", [ride['ActivityId'], 90, wind_speed, distance])[0]['var_cdA']
+  distance = mongoqueries.get_distance_of_ride(mongo, ride['ActivityId'])
+
+  weight = execute_query(sqlqueries.get_profile.format(username=flask_login.current_user.get_id()))[0]['Weight']
+
+  if weight:
+    cdA = execute_procedure("calculate_cda", [ride['ActivityId'], weight, wind_speed, distance])[0]['var_cdA']
+  else:
+    cdA = execute_procedure("calculate_cda", [ride['ActivityId'], 90, wind_speed, distance])[0]['var_cdA']
+    cdA = str(cdA) + " (No weight data found in profile. Used 90 Kilogram for calculation by default)"
+
     
   stats.append(cdA)
     
@@ -309,12 +314,14 @@ def get_profile():
 def update_profile():
   name = request.form['name']
   dateofbirth = request.form['dateofbirth']
+  weight = request.form['weight']
 
   try:
     execute_query(sqlqueries.update_profile.format(
       username=flask_login.current_user.get_id(),
       name=name,
-      dateofbirth=dateofbirth
+      dateofbirth=dateofbirth,
+      weight=weight
       ))
     
     athlete_id = execute_query(sqlqueries.get_user.format(username=flask_login.current_user.get_id()))[0]['AthleteID']
