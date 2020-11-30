@@ -4,6 +4,7 @@ from pymongo import MongoClient
 import flask_login
 import hashlib, uuid
 import gpxpy
+import requests
 import sqlqueries
 import mongoqueries
 import parser
@@ -20,6 +21,9 @@ app.secret_key = os.urandom(24)
 mysql = MySQL(app)
 mongo = MongoClient('localhost', 27017)
 login_manager = flask_login.LoginManager(app)
+
+api_url = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"
+api_key = "c0b4ddbacb034b6986b212012202811"
 
 class User(flask_login.UserMixin):
   def __init__(self, username, active=True):
@@ -54,8 +58,19 @@ def execute_query(query):
   mysql.connection.commit()
   return result
 
+def execute_procedure(procedure, args=[]):
+  cursor = mysql.connection.cursor()
+  cursor.callproc(procedure, args)
+  result = cursor.fetchall()
+  cursor.close()
+  mysql.connection.commit()
+  return result
+
+
 @app.route('/')
 def index():
+  print (execute_procedure("calculate_cda", [170, 90, 20, 22]))
+
   query = request.args.get('query')
 
   if query == None:
@@ -163,6 +178,21 @@ def get_ride(ride_id):
   #end_time = elapsed_time[1]['TimeStamp']
   #stats.append(str(end_time - start_time))
 
+  
+  r = requests.get(api_url, 
+                      params={"key": api_key,
+                              "date": datapoints[0]['TimeStamp'].strftime("%Y-%m-%d"),
+                              "q": "{}, {}".format(datapoints[0]['Latitude'], datapoints[0]['Longitude']),
+                              "format": "json"}).json()
+
+  wind_speed = float(r['data']['weather'][0]['hourly'][0]['windspeedKmph'])
+  wind_direction = r['data']['weather'][0]['hourly'][0]['winddirDegree']
+  distance = mongoqueries.get_distance_of_ride(mongo, ride['ActivityId'])   
+        
+  cdA = execute_procedure("calculate_cda", [ride['ActivityId'], 90, wind_speed, distance])[0]['var_cdA']
+    
+  stats.append(cdA)
+    
   latitude_longitude = {}
   for point in lat_long_data:
     for key in point:

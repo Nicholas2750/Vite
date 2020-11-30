@@ -328,6 +328,14 @@ def get_athlete_min_latitude(mongo):
 def get_athlete_min_longitude(mongo):
     return _get_field_min(mongo, "Longitude")
 
+
+'''
+get distance of ride
+'''
+def get_distance_of_ride(mongo, ride_id):
+    return _get_miles(mongo, query={"ActivityID": ride_id})
+
+
 '''
 user analysis (ARCHIVED)
 '''

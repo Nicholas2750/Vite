@@ -3,8 +3,13 @@
 
 <div class="container">
   <h2 class="my-4"> {{ ride.ActivityName }} </h2>
+  {%if stats.2 %}
+	  <p> Elapsed Time: {{ stats.2 }} </p>
+  {% else %}
+  {% endif %}
+    
   {%if stats.1 %}
-	  <p> Elapsed Time: {{ stats.1 }} </p>
+	  <p> cdA: {{ stats.1 }} </p>
   {% else %}
   {% endif %}
 
