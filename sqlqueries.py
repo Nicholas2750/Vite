@@ -145,7 +145,7 @@ get_row_count       = """
                     """
 
 get_elapsed_time    = """
-                    (SELECT TimeStamp FROM DataPoint WHERE ActivityID = (SELECT AthleteID FROM Auth WHERE Username='{username}') LIMIT 1)
+                    (SELECT MIN(TimeStamp) AS TimeStamp FROM DataPoint WHERE ActivityID={activity_id})
                     UNION
                     (SELECT TimeStamp FROM DataPoint WHERE ActivityID={activity_id} LIMIT {row_count},1);
                     """
