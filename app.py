@@ -171,10 +171,10 @@ def get_ride(ride_id):
     calorie_count = None
   stats.append(calorie_count)
 
-  #elapsed_time = execute_query(sqlqueries.get_elapsed_time.format(activity_id=ride_id, row_count=data_point_count-1, username=flask_login.current_user.get_id()))
-  #start_time = elapsed_time[0]['TimeStamp']
-  #end_time = elapsed_time[1]['TimeStamp']
-  #stats.append(str(end_time - start_time))
+  elapsed_time = execute_query(sqlqueries.get_elapsed_time.format(activity_id=ride_id, row_count=data_point_count-1, username=flask_login.current_user.get_id()))
+  start_time = elapsed_time[0]['TimeStamp']
+  end_time = elapsed_time[1]['TimeStamp']
+  stats.append(str(end_time - start_time))
 
   
   r = requests.get(api_url, 
