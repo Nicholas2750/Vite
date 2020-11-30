@@ -33,7 +33,7 @@ get_lat_long    = """
                 WHERE rownum % {interval} = 1 AND ActivityID={activity_id};"""
 
 get_profile     = """
-                SELECT Name, DateOfBirth
+                SELECT Name, DateOfBirth, Weight
                 FROM Athlete NATURAL JOIN Auth
                 WHERE Username='{username}';
                 """
@@ -114,7 +114,7 @@ add_athlete     = """
 
 update_profile  = """
                 UPDATE Athlete
-                SET Name = '{name}', DateOfBirth = '{dateofbirth}'
+                SET Name = '{name}', DateOfBirth = '{dateofbirth}', Weight = '{weight}'
                 WHERE AthleteID = (
                                     SELECT AthleteID
                                     FROM Auth
