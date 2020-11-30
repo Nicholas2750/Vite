@@ -4,18 +4,18 @@
 <div class="container">
   <h2 class="my-4"> {{ ride.ActivityName }} </h2>
   {%if stats.2 %}
-	  <p> Elapsed Time: {{ stats.2 }} </p>
+	  <p class="lead"> Elapsed Time: {{ stats.2 }} </p>
   {% else %}
   {% endif %}
     
   {%if stats.1 %}
-	  <p> cdA: {{ stats.1 }} </p>
+	  <p class="lead"> cdA: {{ stats.1 }} </p>
   {% else %}
   {% endif %}
 
   {%if stats.0 %}
-	  <p> Calories Burned: {{ stats.0.0 }} </p>
-	  <p> Equal to {{ stats.0.1 }} McDonald's Big Mac's!</p>
+	  <p class="lead"> Calories Burned: {{ stats.0.0 }} </p>
+	  <p class="lead"> Equal to {{ stats.0.1 }} McDonald's Big Mac's!</p>
   {% else %}
   {% endif %}
 
