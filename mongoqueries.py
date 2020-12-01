@@ -59,7 +59,7 @@ def _get_miles(mongo, query):
     ret = 0;
     for x in result:
         ret += x['value']
-    return ret;
+    return round(ret, 3);
     
     
 def _get_hours(mongo, query):
@@ -81,7 +81,10 @@ def _get_hours(mongo, query):
     for x in q:
         ret += x['time']
         
-    return ret / (1000 * 60 * 60)
+    ret /= (1000 * 60 * 60)
+    if ret == 0:
+        return 0
+    return round(ret, 3);
     
     
 def _get_calories(mongo, query):
@@ -99,7 +102,8 @@ def _get_calories(mongo, query):
     )
 
     try:
-      return (list(q)[0]['sum'] / 1000) * 4.184 * 0.22
+      ret = (list(q)[0]['sum'] / 1000) * 4.184 * 0.22
+      return round(ret, 3);
     except:
       return 0
     
@@ -109,14 +113,14 @@ def _get_field_max(mongo, field):
     ride_id, val = q["ActivityID"], q[field]
     athlete_id = mongo.db.Ride.find_one({"ActivityID": ride_id})["AthleteID"]
     username = mongo.db.Auth.find_one({"AthleteID": athlete_id})["Username"]
-    return [username, val]
+    return [username, round(val, 3)]
 
 def _get_field_min(mongo, field):
     q = mongo.db.DataPoint.find_one({field: {"$ne": None}}, sort=[(field, pymongo.ASCENDING)])
     ride_id, val = q["ActivityID"], q[field]
     athlete_id = mongo.db.Ride.find_one({"ActivityID": ride_id})["AthleteID"]
     username = mongo.db.Auth.find_one({"AthleteID": athlete_id})["Username"]
-    return [username, val]
+    return [username, round(val, 3)]
     
     
     
@@ -136,7 +140,7 @@ def get_global_avg_age(mongo):
         [
             {"$group": { 
                 "_id": None,
-                "avg" : { "$avg": "$Age" }
+                "avg" : { "$avg": "$DateOfBirth" }
             }},
             {"$project": {"_id": 0, 
                           "avg": 1
@@ -145,7 +149,7 @@ def get_global_avg_age(mongo):
     )
 
     try:
-      return list(q)[0]['avg']
+      return (datetime.now() - list(q)[0]['avg']).year
     except:
       return 0
     
@@ -218,9 +222,9 @@ def get_global_activities_last_year(mongo):
 '''
 get_leaderboard returns a dictionary
 
-d["week"]: list of usernames of athletes ranked by miles for the past week
-d["month"]: list of usernames of athletes ranked by miles for the past month
-d["year"]: list of usernames of athletes ranked by miles for the past year
+d["week"]: list of usernames of athletes ranked by hours for the past week
+d["month"]: list of usernames of athletes ranked by hours for the past month
+d["year"]: list of usernames of athletes ranked by hours for the past year
 '''
 def get_leaderboard(mongo):
     usernames = [x["Username"] for x in mongo.db.Auth.find({})]
