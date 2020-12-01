@@ -9,6 +9,7 @@ import sqlqueries
 import mongoqueries
 import parser
 import os
+from datetime import datetime, timedelta
 
 app = Flask(__name__, static_url_path='/static', template_folder='html')
 app.config['MYSQL_HOST'] = 'localhost'
@@ -185,14 +186,17 @@ def get_ride(ride_id):
 
   wind_speed = float(r['data']['weather'][0]['hourly'][0]['windspeedKmph'])
   wind_direction = r['data']['weather'][0]['hourly'][0]['winddirDegree']
+    
   distance = mongoqueries.get_distance_of_ride(mongo, ride['ActivityId'])
 
   weight = execute_query(sqlqueries.get_profile.format(username=flask_login.current_user.get_id()))[0]['Weight']
 
+  print (execute_procedure("calculate_cda", [ride['ActivityId'], weight, distance, wind_speed, wind_direction])[0])
+    
   if weight:
-    cdA = execute_procedure("calculate_cda", [ride['ActivityId'], weight, wind_speed, distance])[0]['var_cdA']
+    cdA = execute_procedure("calculate_cda", [ride['ActivityId'], weight, distance, wind_speed, wind_direction])[0]['var_cdA']
   else:
-    cdA = execute_procedure("calculate_cda", [ride['ActivityId'], 90, wind_speed, distance])[0]['var_cdA']
+    cdA = execute_procedure("calculate_cda", [ride['ActivityId'], 90, distance, wind_speed, wind_direction])[0]['var_cdA']
     cdA = str(cdA) + " (No weight data found in profile. Used 90 Kilogram for calculation by default)"
 
     

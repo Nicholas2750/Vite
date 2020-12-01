@@ -5,16 +5,16 @@ DELIMITER //
 CREATE PROCEDURE calculate_cda(
     IN ActivityID REAL,
     IN var_mass REAL,
-    IN var_wind REAL,
-    IN var_distance REAL
+    IN var_distance REAL,
+    IN var_wind_speed REAL,
+    IN var_wind_direction REAL
 )
 BEGIN
 
-DECLARE var_cdA REAL;
 
 DECLARE var_dist REAL;
 DECLARE var_gravity REAL;
-DECLARE var_drag_coeff REAL;
+DECLARE var_crr_coeff REAL;
 DECLARE var_E REAL;
 DECLARE var_R REAL;
 DECLARE var_M REAL;
@@ -22,6 +22,10 @@ DECLARE var_L REAL;
 DECLARE var_P0 REAL;
 DECLARE var_T0 REAL;
 
+DECLARE var_lat_initial REAL;
+DECLARE var_lon_initial REAL;
+DECLARE var_lat_final REAL;
+DECLARE var_lon_final REAL;
 DECLARE var_t_initial TIMESTAMP;
 DECLARE var_e_initial REAL;
 DECLARE var_t_final TIMESTAMP;
@@ -29,20 +33,24 @@ DECLARE var_e_final REAL;
 
 DECLARE var_power REAL;
 DECLARE var_temperature REAL;
-DECLARE var_elevation REAL;
 DECLARE var_slope REAL;
 DECLARE var_velocity REAL;
 DECLARE var_air_velocity REAL;
 DECLARE var_air_density REAL;
+DECLARE var_direction REAL;
 
 DECLARE var_rr REAL;
 DECLARE var_pe REAL;
+DECLARE var_cdA REAL;
 
 
 
 SET var_dist = var_distance * 1.60934 * 1000;
+SET var_wind_speed = var_wind_speed * 1000 / 3600;
+SET var_wind_direction = RADIANS(var_wind_direction);
+
 SET var_gravity = 9.80665;
-SET var_drag_coeff = 0.012;
+SET var_crr_coeff = 0.002;
 SET var_E = 2.7183;
 SET var_R = 8.31447;
 SET var_M = 0.02896;
@@ -51,15 +59,15 @@ SET var_P0 = 101325;
 SET var_T0 = 288.15;
 
 
-SELECT TimeStamp, Elevation
-INTO var_t_initial, var_e_initial
+SELECT TimeStamp, Elevation, Latitude, Longitude
+INTO var_t_initial, var_e_initial, var_lat_initial, var_lon_initial
 FROM DataPoint D
 WHERE D.ActivityID = ActivityID
 ORDER BY TimeStamp ASC
 LIMIT 1;
 
-SELECT TimeStamp, Elevation
-INTO var_t_final, var_e_final
+SELECT TimeStamp, Elevation, Latitude, Longitude
+INTO var_t_final, var_e_final, var_lat_final, var_lon_final
 FROM DataPoint D
 WHERE D.ActivityID = ActivityID
 ORDER BY TimeStamp DESC
@@ -81,26 +89,26 @@ IF(var_temperature IS NULL) THEN
 END IF;
 SET var_temperature = var_temperature + 273.15;
 
-SELECT avg(Elevation)
-INTO var_elevation
-FROM DataPoint D
-WHERE D.ActivityID = ActivityID;
 
+
+SET var_direction = ATAN2(
+COS(RADIANS(var_lat_final)) * SIN(RADIANS(var_lon_final - var_lon_initial)),
+COS(RADIANS(var_lat_initial)) * SIN(RADIANS(var_lat_final)) - SIN(RADIANS(var_lat_initial)) * COS(RADIANS(var_lat_final)) * COS(RADIANS(var_lon_final - var_lon_initial))
+);
 
 
 SET var_slope = (var_e_final - var_e_initial) / var_dist;
 SET var_velocity = var_dist / ABS(TIMESTAMPDIFF(SECOND, var_t_initial, var_t_final));
 
-SET var_air_velocity = var_wind;
+SET var_air_velocity = var_velocity + COS(ABS(var_direction - var_wind_direction)) * var_wind_speed;
 SET var_air_density = (var_P0 * var_M / (var_R * var_T0)) * POWER(var_temperature / var_T0, var_gravity * var_M / (var_R * var_L - 1));
 
-SET var_rr = var_drag_coeff * var_mass * var_gravity * var_velocity;
+SET var_rr = var_crr_coeff * var_mass * var_gravity * var_velocity;
 SET var_pe = var_slope * var_mass * var_gravity * var_velocity;
 
 SET var_cdA = (var_power - var_rr - var_pe) / (0.5 * var_air_density * var_air_velocity * var_air_velocity * var_velocity);
-SET var_cdA = var_cdA;
 
-SELECT var_cdA;
+SELECT var_distance, var_velocity, var_air_velocity, var_power, var_slope, var_e_final, var_e_initial, var_rr, var_pe, var_cdA;
 
 END //
 

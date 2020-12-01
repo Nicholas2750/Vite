@@ -3,7 +3,7 @@ Note:
 docs are in section headers, read all the comments
 
 if calling functions in app.py, MongoClient is already created there as variable "mongo", so literally 
-call any function here exactly like the function definition
+call any function here exactly like the function definition (if it only has the mongo parameter)
 
 ex: (in app.py) mongoqueries.get_global_miles(mongo)
 this returns a single number: the total miles for all athletes combined
@@ -121,8 +121,35 @@ def _get_field_min(mongo, field):
     
     
 '''
+get ride
+'''
+def get_ride(mongo, ride_id):
+    q = mongo.db.Ride.find_one({"ActivityID": ride_id}, sort=[("TimeStamp", pymongo.ASCENDING)])
+    return q
+
+
+'''
 all functions in this section return a single number
 '''    
+def get_global_avg_age(mongo):
+    q = mongo.db.Athlete.aggregate( 
+        [
+            {"$group": { 
+                "_id": None,
+                "avg" : { "$avg": "$Age" }
+            }},
+            {"$project": {"_id": 0, 
+                          "avg": 1
+            }},
+        ]
+    )
+
+    try:
+      return list(q)[0]['avg']
+    except:
+      return 0
+    
+    
 def get_global_miles(mongo):
     return _get_miles(mongo, query={})
 
@@ -335,8 +362,9 @@ get distance of ride
 def get_distance_of_ride(mongo, ride_id):
     return _get_miles(mongo, query={"ActivityID": ride_id})
 
-
 '''
+
+
 user analysis (ARCHIVED)
 '''
 
