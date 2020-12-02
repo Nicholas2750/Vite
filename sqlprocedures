@@ -106,6 +106,7 @@ SET var_pe = var_slope * var_mass * var_gravity * var_velocity;
 SET var_ke = var_mass * var_velocity * var_stddev_elevation * var_stddev_elevation * 0.00021;
 
 SET var_cdA = (var_power - var_rr - var_pe - var_ke) / (0.5 * var_air_density * var_air_velocity * var_air_velocity * var_velocity);
+SET var_cdA = ROUND(var_cdA, 3);
 
 SELECT var_distance, var_velocity, var_air_velocity, var_power, var_slope, var_stddev_elevation, var_e_final, var_e_initial, var_rr, var_pe, var_cdA;
 
