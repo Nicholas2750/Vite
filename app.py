@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect
 from flask_mysqldb import MySQL
+from flask_caching import Cache
 from pymongo import MongoClient
 import flask_login
 import hashlib, uuid
@@ -25,6 +26,8 @@ login_manager = flask_login.LoginManager(app)
 
 api_url = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"
 api_key = "c0b4ddbacb034b6986b212012202811"
+
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 class User(flask_login.UserMixin):
   def __init__(self, username, active=True):
@@ -339,6 +342,7 @@ def update_profile():
     return render_template('profile.html', profile=profile, stats=stats, alert="You input was not formatted correctly")
 
 @app.route('/global', methods=['GET'])
+@cache.cached(timeout=600)
 def get_global():
   stats = {}
 
@@ -360,12 +364,14 @@ def get_global():
   return render_template('global.html', stats=stats)
 
 @app.route('/leaderboard', methods=['GET'])
+@cache.cached(timeout=600)
 def get_leaderboard():
   leaderboard = mongoqueries.get_leaderboard(mongo)
 
   return render_template('leaderboard.html', leaderboard=leaderboard)
 
 @app.route('/fame', methods=['GET'])
+@cache.cached(timeout=600)
 def get_hall_of_fame():
   stats = {}
   stats['max_elevation'] = mongoqueries.get_athlete_max_elevation(mongo)
