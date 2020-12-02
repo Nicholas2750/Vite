@@ -191,8 +191,6 @@ def get_ride(ride_id):
 
   weight = execute_query(sqlqueries.get_profile.format(username=flask_login.current_user.get_id()))[0]['Weight']
 
-  print (execute_procedure("calculate_cda", [ride['ActivityId'], weight, distance, wind_speed, wind_direction])[0])
-    
   if weight:
     cdA = execute_procedure("calculate_cda", [ride['ActivityId'], weight, distance, wind_speed, wind_direction])[0]['var_cdA']
   else:
